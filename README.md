@@ -26,7 +26,7 @@ THEN that will be shown on the page, and added to their transaction history when
 
 ## Installation
 
-Visit the site on github pages at: https://jessefitnesstracker.herokuapp.com/
+Visit the site on github pages at: https://jesseindexeddbexpensestracker.herokuapp.com/
 
 ## Usage
 
