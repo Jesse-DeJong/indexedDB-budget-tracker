@@ -19,14 +19,46 @@ request.onsuccess = (event) => {
     tx = db.transaction("pending", "readwrite");
     store = tx.objectStore("pending");
 
+    if(navigator.onLine) {
+        onlineUpdate();
+    }
     // tx.oncomplete = () => {
     //     db.close();
     // }
 };
 
-// Frontend Calls
+// Offline saving of records
 function saveRecord (transaction) {
     tx = db.transaction("pending", "readwrite");
     store = tx.objectStore("pending");
     store.add(transaction);
 };
+
+// Update database when back online
+function onlineUpdate () {
+    tx = db.transaction("pending", "readwrite");
+    store = tx.objectStore("pending");
+    retrieved = store.getAll();
+
+    retrieved.onsuccess = () => {
+        if(retrieved.result.length > 0) {
+            fetch("/api/transaction/bulk", {
+                method: "POST",
+                body: JSON.stringify(retrieved.result),
+                headers: {
+                    Accept: "application/json, text/plain, */*",
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(res => res.json())
+            .then(() => {
+                tx = db.transaction("pending", "readwrite");
+                store = tx.objectStore("pending");
+                store.clear();
+            });
+        }
+    };
+};
+
+// Eventlistener for network connectivity
+window.addEventListener("online",checkDatabase);
